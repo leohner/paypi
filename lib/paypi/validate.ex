@@ -100,7 +100,7 @@ defmodule Paypi.Validate do
   end
 
 
-
+  # binary was passed and couldn't be converted to an integer
   defp check_order_id({:error, _invalid_input}) do
     # cannot proceed, so set result status and message
     message = "Invalid Order ID"
@@ -110,6 +110,12 @@ defmodule Paypi.Validate do
     Store.set_id_exists(:false)
   end
 
+  # binary was passed and could be converted to an integer
+  defp check_order_id({:ok, order_id}) do
+    check_order_id(order_id)
+  end
+
+  # check integer version of order id
   defp check_order_id(order_id) do
     # update agent order id to integer
     Store.set_order_id(order_id)
