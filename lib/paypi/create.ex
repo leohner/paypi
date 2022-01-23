@@ -2,26 +2,26 @@ defmodule Paypi.Create do
   alias Paypi.Data
   alias Paypi.Validate
 
-  def create_order({customer_id, order_value}) do
-    {customer_status, id} = Validate.check_customer_exists(customer_id)
-    {order_value_status, value} = Validate.check_order_value(order_value)
+  def create_order({customer_id, order_amount}) do
+    {customer_status, customer_id} = customer_id |> Validate.check_customer_exists()
+    {order_amount_status, order_amount} = order_amount |> Validate.check_order_amount()
 
-    create_order(customer_status, order_value_status, id, value)
+    create_order(customer_status, order_amount_status, customer_id, order_amount)
   end
 
-  defp create_order(:ok, :ok, customer_id, order_value) do
-    Data.create_order(customer_id, order_value)
+  defp create_order(:ok, :ok, customer_id, order_amount) do
+    Data.create_order(customer_id, order_amount)
   end
 
   defp create_order(:error, _, _, _) do
-    IO.puts "Customer id provided isn't an integer"
+    {:error, "Customer ID provided is not an integer"}
   end
 
   defp create_order(:not_found, _, _, _) do
-    IO.puts "Invalid customer id"
+    {:error, "Invalid customer id"}
   end
 
   defp create_order(_, :error, _, _) do
-    IO.puts "Order Value isn't valid"
+    {:error, "Order amount isn't valid"}
   end
 end

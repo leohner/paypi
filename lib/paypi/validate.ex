@@ -14,22 +14,34 @@ defmodule Paypi.Validate do
       |> check_customer_id()
   end
 
-  def check_order_value(order_value)
-      when is_float(order_value)
-      and order_value > 0 do
-    {:ok, order_value}
+  def check_order_amount(order_amount)
+      when is_number(order_amount)
+      and order_amount > 0 do
+    {:ok, order_amount / 1}
   end
 
-  def check_order_value(order_value)
-      when is_integer(order_value)
-      and order_value > 0 do
-    {:ok, order_value / 1}
-  end
-
-  def check_order_value(_order_value) do
+  def check_order_amount(_order_amount) do
     {:error, "Invalid input. Need float between 0 and higher"}
   end
 
+  def check_order_exists(order_id) do
+    status = order_id |> Data.get_order_by_id()
+    {status, order_id}
+  end
+
+  def check_payment_key(order_id, payment_key) do
+    IO.inspect Data.get_order_with_payment_key(order_id, payment_key)
+  end
+
+  def check_payment_amount(amount)
+      when is_number(amount)
+      and amount > 0 do
+    {:ok, amount / 1}
+  end
+
+  ## ***
+  ## Private Functions
+  ## ***
 
   defp check_parse_result(:error) do
     {:error, "Parse Error"}

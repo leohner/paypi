@@ -6,8 +6,8 @@ defmodule Paypi.Schema.Customer do
     field :email, :string
   end
 
-  def changset(user, params \\ %{}) do
-    user
+  def changset(customer, params \\ %{}) do
+    customer
       |> cast(params, [:email])
       |> validate_required([:email])
   end
