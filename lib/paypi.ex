@@ -8,35 +8,55 @@ defmodule Paypi do
   """
 
   def run({:create_order, customer_id, order_amount}) do
-    params = [action: :create_order, customer_id: customer_id, order_amount: order_amount]
+    params = %{action: :create_order, customer_id: customer_id, order_amount: order_amount}
     Store.start_link(params)
 
     Create.create_order(customer_id, order_amount)
+
+    inspect_results()
   end
 
-  def run({:get_order, order_id}) when is_integer(order_id) do
-    params = [action: :get_order, order_id: order_id]
+  def run({:get_order, order_id}) do
+    params = %{action: :get_order, order_id: order_id}
     Store.start_link(params)
-    Store.get_action()
 
     Get.get_order(order_id)
+
+    inspect_results()
   end
 
   def run({:get_orders, email}) when is_binary(email) do
-    params = [action: :get_order, email: email]
+    params = %{action: :get_order, email: email}
     Store.start_link(params)
 
     Get.get_orders(email)
+
+    inspect_results()
   end
 
   def run({:pay, order_id, amount, payment_key}) when is_integer(order_id) do
-    params = [action: :pay, order_id: order_id, amount: amount, payment_key: payment_key]
+    params = %{action: :pay, order_id: order_id, amount: amount, payment_key: payment_key}
     Store.start_link(params)
 
     Pay.pay(order_id, amount, payment_key)
+
+    inspect_results()
   end
 
   def run(_) do
-    IO.puts "Invalid data provided"
+    params = %{action: :invalid}
+    Store.start_link(params)
+
+    inspect_results()
+  end
+
+
+
+  ## ***
+  ## Private Functions
+  ## ***
+
+  defp inspect_results() do
+    Store.print_everything()
   end
 end

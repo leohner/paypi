@@ -7,17 +7,41 @@ defmodule Paypi.Store do
 
   # add result status to the store
   def set_result_status(status) do
-    Agent.update(__MODULE__, &([[result_status: status] | &1]))
+    Agent.update(__MODULE__, &Map.put(&1, :result_status, status))
   end
 
   # add result message to the store
   def set_result_message(message) do
-    Agent.update(__MODULE__, &([[result_message: message] | &1]))
+    Agent.update(__MODULE__, &Map.put(&1, :result_message, message))
   end
 
-  # add database output to the store
-  def set_output(output) do
-    Agent.update(__MODULE__, &([[output: output] | &1]))
+  # add transaction information to the store
+  def set_transaction_info(info) do
+    Agent.update(__MODULE__, &Map.put(&1, :transaction_info, info))
+  end
+
+  def set_customer_id(customer_id) do
+    Agent.update(__MODULE__, &Map.put(&1, :customer_id, customer_id))
+  end
+
+  def set_id_exists(id_exists) do
+    Agent.update(__MODULE__, &Map.put(&1, :id_exists, id_exists))
+  end
+
+  def set_order_id(order_id) do
+    Agent.update(__MODULE__, &Map.put(&1, :order_id, order_id))
+  end
+
+  def set_order_amount(order_amount) do
+    Agent.update(__MODULE__, &Map.put(&1, :order_amount, order_amount))
+  end
+
+  def set_order_payments(payments) do
+    Agent.update(__MODULE__, &Map.put(&1, :order_payments, payments))
+  end
+
+  def set_payment_amount(payment_amount) do
+    Agent.update(__MODULE__, &Map.put(&1, :payment_amount, payment_amount))
   end
 
   # returns action, nil if not found
@@ -45,6 +69,10 @@ defmodule Paypi.Store do
     Agent.get(__MODULE__, &(&1[:order_amount]))
   end
 
+  def get_order_payments() do
+    Agent.get(__MODULE__, &(&1[:order_payments]))
+  end
+
   # returns payment amount, nil if not found
   def get_payment_amount() do
     Agent.get(__MODULE__, &(&1[:payment_amount]))
@@ -65,8 +93,16 @@ defmodule Paypi.Store do
     Agent.get(__MODULE__, &(&1[:result_message]))
   end
 
-  # returns data from database, nil if not found
-  def get_output() do
-    Agent.get(__MODULE__, &(&1[:output]))
+  # returns transaction info, nil if not found
+  def get_transaction_info() do
+    Agent.get(__MODULE__, &(&1[:transaction_info]))
+  end
+
+  def get_payments() do
+    Agent.get(__MODULE__, &(&1[:payments]))
+  end
+
+  def print_everything() do
+    IO.inspect Agent.get(__MODULE__, &(&1))
   end
 end
