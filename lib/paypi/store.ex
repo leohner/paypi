@@ -15,6 +15,11 @@ defmodule Paypi.Store do
     Agent.update(__MODULE__, &([[result_message: message] | &1]))
   end
 
+  # add database output to the store
+  def set_output(output) do
+    Agent.update(__MODULE__, &([[output: output] | &1]))
+  end
+
   # returns action, nil if not found
   def get_action() do
     Agent.get(__MODULE__, &(&1[:action]))
@@ -60,4 +65,8 @@ defmodule Paypi.Store do
     Agent.get(__MODULE__, &(&1[:result_message]))
   end
 
+  # returns data from database, nil if not found
+  def get_output() do
+    Agent.get(__MODULE__, &(&1[:output]))
+  end
 end

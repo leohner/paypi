@@ -11,7 +11,7 @@ defmodule Paypi do
     params = [action: :create_order, customer_id: customer_id, order_amount: order_amount]
     Store.start_link(params)
 
-    Create.create_order({customer_id, order_amount})
+    Create.create_order(customer_id, order_amount)
   end
 
   def run({:get_order, order_id}) when is_integer(order_id) do
