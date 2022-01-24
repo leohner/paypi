@@ -24,8 +24,16 @@ defmodule Paypi.Store do
     Agent.update(__MODULE__, &Map.put(&1, :customer_id, customer_id))
   end
 
-  def set_id_exists(id_exists) do
-    Agent.update(__MODULE__, &Map.put(&1, :id_exists, id_exists))
+  def set_id_valid(is_valid) do
+    Agent.update(__MODULE__, &Map.put(&1, :id_valid, is_valid))
+  end
+
+  def set_email(email) do
+    Agent.update(__MODULE__, &Map.put(&1, :email, email))
+  end
+
+  def set_email_valid(is_valid) do
+    Agent.update(__MODULE__, &Map.put(&1, :email_valid, is_valid))
   end
 
   def set_order_id(order_id) do
@@ -36,6 +44,10 @@ defmodule Paypi.Store do
     Agent.update(__MODULE__, &Map.put(&1, :order_amount, order_amount))
   end
 
+  def set_order_amount_valid(is_valid) do
+    Agent.update(__MODULE__, &Map.put(&1, :order_amount_valid, is_valid))
+  end
+
   def set_order_payments(payments) do
     Agent.update(__MODULE__, &Map.put(&1, :order_payments, payments))
   end
@@ -44,9 +56,29 @@ defmodule Paypi.Store do
     Agent.update(__MODULE__, &Map.put(&1, :payment_amount, payment_amount))
   end
 
+  def set_payment_amount_numerically_valid(is_valid) do
+    Agent.update(__MODULE__, &Map.put(&1, :payment_amount_numerically_valid, is_valid))
+  end
+
+  def set_payment_key_valid(is_valid) do
+    Agent.update(__MODULE__, &Map.put(&1, :payment_key_valid, is_valid))
+  end
+
+  def set_is_payment_valid(is_valid) do
+    Agent.update(__MODULE__, &Map.put(&1, :is_payment_valid, is_valid))
+  end
+
+  def set_did_server_crash(crashed) do
+    Agent.update(__MODULE__, &Map.put(&1, :did_server_crash, crashed))
+  end
+
   # returns action, nil if not found
   def get_action() do
     Agent.get(__MODULE__, &(&1[:action]))
+  end
+
+  def get_id_valid() do
+    Agent.get(__MODULE__, &(&1[:id_valid]))
   end
 
   # returns customer id, nil if not found
@@ -64,9 +96,17 @@ defmodule Paypi.Store do
     Agent.get(__MODULE__, &(&1[:email]))
   end
 
+  def get_email_valid() do
+    Agent.get(__MODULE__, &(&1[:email_valid]))
+  end
+
   # returns order amount, nil if not found
   def get_order_amount() do
     Agent.get(__MODULE__, &(&1[:order_amount]))
+  end
+
+  def get_order_amount_valid() do
+    Agent.get(__MODULE__, &(&1[:order_amount_valid]))
   end
 
   def get_order_payments() do
@@ -76,6 +116,10 @@ defmodule Paypi.Store do
   # returns payment amount, nil if not found
   def get_payment_amount() do
     Agent.get(__MODULE__, &(&1[:payment_amount]))
+  end
+
+  def get_payment_amount_numerically_valid() do
+    Agent.get(__MODULE__, &(&1[:payment_amount_numerically_valid]))
   end
 
   # returns payment key, nil if not found
@@ -102,7 +146,48 @@ defmodule Paypi.Store do
     Agent.get(__MODULE__, &(&1[:payments]))
   end
 
+  def get_payment_key_valid() do
+    Agent.get(__MODULE__, &(&1[:payment_key_valid]))
+  end
+
+  def get_is_payment_valid() do
+    Agent.get(__MODULE__, &(&1[:is_payment_valid]))
+  end
+
+  def get_did_server_crash() do
+    Agent.get(__MODULE__, &(&1[:did_server_crash]))
+  end
+
   def print_everything() do
     IO.inspect Agent.get(__MODULE__, &(&1))
   end
+
+
+
+  def generate_final_status() do
+    check_action()
+    check_id_valid()
+  end
+
+  defp check_action() do
+    case get_action() do
+      :invalid -> set_results(:error, "Invalid API Call")
+      _ -> :ok
+    end
+  end
+
+  defp check_id_valid() do
+    case get_id_valid() do
+      :true -> :ok
+      :false -> set_results(:error, "Invalid ID")
+      _ -> :ok
+    end
+  end
+
+  defp set_results(status, message) do
+    set_result_status(status)
+    set_result_message(message)
+  end
+
+
 end

@@ -16,27 +16,23 @@ defmodule Paypi.Validate do
 
   # We can't continue because we have an invalid customer id
   def check_customer_exists(_invalid_input) do
-    Store.set_result_status(:error)
-    Store.set_result_message("Invalid Customer ID")
-    Store.set_id_exists(:false)
+    Store.set_id_valid(:false)
   end
 
   def check_order_amount(order_amount)
       when is_number(order_amount)
       and order_amount > 0 do
     # convert order amount to float in case it's an integer and update store
+    Store.set_order_amount_valid(:true)
+    Store.set_order_amount(order_amount / 1)
     order_amount = order_amount / 1
-    Store.set_order_amount(order_amount)
 
     {:ok, order_amount}
   end
 
   def check_order_amount(_order_amount) do
-    message = "Invalid input. Need a number higher than 0"
-    Store.set_result_status(:error)
-    Store.set_result_message(message)
-
-    {:error, message}
+    Store.set_order_amount_valid(:false)
+    Store.set_payment_amount_numerically_valid(:false)
   end
 
   def check_order_exists(order_id) when is_integer(order_id) do
@@ -51,14 +47,32 @@ defmodule Paypi.Validate do
       |> check_order_id()
   end
 
-  def check_payment_key(order_id, payment_key) do
+  def check_payment_key(payment_key, order_id) when is_integer(order_id) do
     Data.get_order_with_payment_key(order_id, payment_key)
+  end
+
+  # order id isn't an integer -- can't proceed
+  def check_payment_key(_payment_key, _order_id) do
+    :ok
   end
 
   def check_payment_amount(amount)
       when is_number(amount)
       and amount > 0 do
-    {:ok, amount / 1}
+
+    Store.set_payment_amount_numerically_valid(:true)
+  end
+
+  def check_payment_amount(amount)
+      when is_binary(amount) do
+    amount
+      |> String.trim()
+      |> Float.parse()
+      |> check_payment_parse_result()
+  end
+
+  def check_payment_amount(_invalid_amount) do
+    Store.set_payment_amount_numerically_valid(:false)
   end
 
 
@@ -69,32 +83,40 @@ defmodule Paypi.Validate do
 
   # Parsing returns error if fails, so we need to standardize return
   defp check_parse_result(:error) do
-    {:error, "Parse Error"}
+    Store.set_id_valid(:false)
+    {:error, "Invalid ID"}
   end
 
   # Parsing returns tuple if success, so we need to standardize return
   defp check_parse_result({result, _}) do
+    Store.set_id_valid(:true)
     {:ok, result}
+  end
+
+
+  defp check_payment_parse_result({amount, _}) do
+    Store.set_payment_amount(amount / 1)
+    Store.set_payment_amount_numerically_valid(:true)
+  end
+
+  defp check_payment_parse_result(:error) do
+    Store.set_payment_amount_numerically_valid(:false)
   end
 
 
 
   # we've got an integer, so now we need to find a customer
-  defp check_customer_id({:ok, customer_id}) do
+  def check_customer_id({:ok, customer_id}) do
     # update agent customer id to integer
     Store.set_customer_id(customer_id)
     customer_id |> Data.get_customer_by_id()
   end
 
-  defp check_customer_id({:error, _invalid_input}) do
-    message = "Invalid Customer ID"
-
-    Store.set_result_status(:error)
-    Store.set_result_message(message)
-    Store.set_id_exists(:false)
+  def check_customer_id({:error, _invalid_input}) do
+    Store.set_id_valid(:false)
   end
 
-  defp check_customer_id(customer_id) do
+  def check_customer_id(customer_id) do
     Store.set_customer_id(customer_id)
     customer_id |> Data.get_customer_by_id()
   end
@@ -102,12 +124,8 @@ defmodule Paypi.Validate do
 
   # binary was passed and couldn't be converted to an integer
   defp check_order_id({:error, _invalid_input}) do
-    # cannot proceed, so set result status and message
-    message = "Invalid Order ID"
-
-    Store.set_result_status(:error)
-    Store.set_result_message(message)
-    Store.set_id_exists(:false)
+    # cannot proceed; set id to not valid
+    Store.set_id_valid(:false)
   end
 
   # binary was passed and could be converted to an integer
