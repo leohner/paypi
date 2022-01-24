@@ -64,6 +64,11 @@ defmodule Paypi.Data do
   end
 
 
+  def get_email_by_order_id(order_id) do
+
+  end
+
+
 
   # returns list of tuples with records; empty list if nothing found
   def get_orders_for_customer(email) do

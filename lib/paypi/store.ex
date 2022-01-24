@@ -68,6 +68,10 @@ defmodule Paypi.Store do
     Agent.update(__MODULE__, &Map.put(&1, :is_payment_valid, is_valid))
   end
 
+  def set_remaining_balance(balance) do
+    Agent.update(__MODULE__, &Map.put(&1, :remaining_balance, balance))
+  end
+
   def set_did_server_crash(crashed) do
     Agent.update(__MODULE__, &Map.put(&1, :did_server_crash, crashed))
   end
@@ -154,6 +158,10 @@ defmodule Paypi.Store do
     Agent.get(__MODULE__, &(&1[:is_payment_valid]))
   end
 
+  def get_remaining_balance() do
+    Agent.get(__MODULE__, &(&1[:remaining_balance]))
+  end
+
   def get_did_server_crash() do
     Agent.get(__MODULE__, &(&1[:did_server_crash]))
   end
@@ -164,30 +172,43 @@ defmodule Paypi.Store do
 
 
 
-  def generate_final_status() do
-    check_action()
-    check_id_valid()
+  def generate_payload(:create) do
+    %{}
+      |> add_to_payload(:action, get_action())
+      |> add_to_payload(:customer_id, get_customer_id())
+      |> add_to_payload(:customer_id_valid, get_id_valid())
+      |> add_to_payload(:order_amount, get_order_amount())
+      |> add_to_payload(:order_amount_valid, get_order_amount_valid())
   end
 
-  defp check_action() do
-    case get_action() do
-      :invalid -> set_results(:error, "Invalid API Call")
-      _ -> :ok
-    end
-  end
-
-  defp check_id_valid() do
-    case get_id_valid() do
-      :true -> :ok
-      :false -> set_results(:error, "Invalid ID")
-      _ -> :ok
-    end
-  end
-
-  defp set_results(status, message) do
-    set_result_status(status)
-    set_result_message(message)
+  def generate_payload(:get) do
+    IO.inspect %{}
+      |> add_to_payload(:action, get_action())
+      |> add_to_payload(:customer_id, get_customer_id())
+      |> add_to_payload(:customer_id_valid, get_id_valid())
+      |> add_to_payload(:customer_email, get_email())
+      |> add_to_payload(:customer_email_valid, get_email_valid())
+      |> add_to_payload(:order_amount_valid, get_order_amount_valid())
+      |> add_to_payload(:order_id, get_order_id())
   end
 
 
+  def generate_payload() do
+      %{}
+        |> add_to_payload(:action, get_action())
+        |> add_to_payload(:order_id, get_order_id())
+        |> add_to_payload(:customer_id, get_customer_id())
+        |> add_to_payload(:email, get_email())
+        |> add_to_payload(:email_valid, get_email_valid())
+        |> add_to_payload(:original_balance, get_order_amount())
+        |> add_to_payload(:current_balance, get_remaining_balance())
+        |> add_to_payload(:previous_payments, get_order_payments())
+        |> add_to_payload(:current_payment, get_payment_amount())
+        |> add_to_payload(:payment_key, get_payment_key())
+        |> add_to_payload(:payment_key_valid, get_payment_key_valid())
+  end
+
+  defp add_to_payload(payload, key, value) do
+    Map.put(payload, key, value)
+  end
 end

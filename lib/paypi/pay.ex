@@ -15,7 +15,7 @@ defmodule Paypi.Pay do
     payment_key_valid = Store.get_payment_key_valid()
 
     order_id = Store.get_order_id()
-    is_payment_valid = payment_valid?(amount, order_id)
+    is_payment_valid = payment_valid?(id_valid, amount, order_id)
 
     submit_payment(id_valid, amount_valid, payment_key_valid, is_payment_valid)
   end
@@ -70,7 +70,7 @@ defmodule Paypi.Pay do
     Store.set_did_server_crash(:false)
 
     order_id = Store.get_order_id()
-    is_payment_valid = payment_valid?(payment_amount, order_id)
+    is_payment_valid = payment_valid?(:true, payment_amount, order_id)
 
     # if we've made it this far, we know the order id is valid
     submit_payment(:true, payment_amount, payment_key, is_payment_valid)
@@ -91,9 +91,10 @@ defmodule Paypi.Pay do
 			|> hd()
 	end
 
-  defp payment_valid?(payment_amount, order_id)
+  defp payment_valid?(id_valid, payment_amount, order_id)
       when is_number(payment_amount)
-      and is_integer(order_id) do
+      and is_integer(order_id)
+      and id_valid == :true do
     Data.get_order_payments()
     Data.get_order_amount()
 
@@ -107,6 +108,7 @@ defmodule Paypi.Pay do
 
     case remaining_balance - payment_amount do
       balance when balance >= 0 ->
+        Store.set_remaining_balance(balance)
         Store.set_is_payment_valid(:true)
         :true
       _ ->
@@ -115,7 +117,7 @@ defmodule Paypi.Pay do
     end
   end
 
-  defp payment_valid?(_payment_amount, _invalid_order_id) do
+  defp payment_valid?(_id_valid, _payment_amount, _invalid_order_id) do
     :false
   end
 

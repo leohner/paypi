@@ -14,7 +14,7 @@ defmodule Paypi do
 
     Create.create_order(customer_id, order_amount)
 
-    generate_final_status()
+    generate_payload(:create)
     inspect_results()
   end
 
@@ -22,9 +22,10 @@ defmodule Paypi do
     params = %{action: :get_order, order_id: order_id}
     Store.start_link(params)
 
+    Data.get_email_by_order_id(order_id)
     Get.get_order(order_id)
 
-    generate_final_status()
+    generate_payload(:get)
     inspect_results()
   end
 
@@ -32,10 +33,9 @@ defmodule Paypi do
     params = %{action: :get_order, email: email}
     Store.start_link(params)
 
-    Data.get_email_validity(email)
     Get.get_orders(email)
 
-    generate_final_status()
+    generate_payload(:get)
     inspect_results()
   end
 
@@ -49,6 +49,7 @@ defmodule Paypi do
     }
       |> Store.start_link()
 
+    generate_payload(:get)
     inspect_results()
   end
 
@@ -63,7 +64,7 @@ defmodule Paypi do
 
     Pay.pay(order_id, amount, payment_key)
 
-    generate_final_status()
+    generate_payload(:pay)
     inspect_results()
   end
 
@@ -74,7 +75,7 @@ defmodule Paypi do
 
     Pay.order_and_pay(customer_id, order_amount, payment_amount, payment_key)
 
-    generate_final_status()
+    generate_payload(:pay)
     inspect_results()
   end
 
@@ -82,7 +83,7 @@ defmodule Paypi do
     params = %{action: :invalid}
     Store.start_link(params)
 
-    generate_final_status()
+    generate_payload(:invalid)
     inspect_results()
   end
 
@@ -104,7 +105,7 @@ defmodule Paypi do
     Store.print_everything()
   end
 
-  defp generate_final_status() do
-    Store.generate_final_status()
+  defp generate_payload(action) do
+    Store.generate_payload(action)
   end
 end
