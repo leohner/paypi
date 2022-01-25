@@ -28,6 +28,8 @@ Lesser features include:
 ## Usage
 The application is used by running the `Paypi.run` function with values specified in a tuple.
 
+Currently there are only two emails in the `Customer` table of the database used for testing purposes: `eleohner@protonmail.com` and `eleohner@gmail.com`. The former has `id` 1 and the latter `id` 2.
+
 ### Create Order
 `mix run -e "Paypi.run({:create_order, customer_id, order_amount})"`
 
@@ -94,4 +96,6 @@ Things I feel like I need to improve:
 - Documenting the code is a necessity. That would absolutely be the next step in order to facilitate its use.
 
 ## Final Notes
-One of the best adventures of my life happened because of Peek: snorkeling in the reefs off of Key Largo, Florida, because John Pennekamp State Park uses Peek products. This was back in October before Peek was on my radar. I would love to learn more, improve my code, and be part of a organization that helps business offer their services and allows people to take adventures they otherwise would not have.
+One of the best adventures of my life happened because of Peek: snorkeling in the coral reefs off of Key Largo, Florida, because John Pennekamp State Park uses Peek products. This was back in October before Peek was on my radar. I would love to learn more, improve my code, and be part of a organization that helps business offer their services and allows people to take adventures they otherwise would not have.
+
+If you want to take a quick break to view a video from the reef: [Coral Reef Clip](https://www.youtube.com/watch?v=IKKaokhppGE).
