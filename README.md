@@ -66,7 +66,7 @@ The application is used by running the `Paypi.run` function with values specifie
 ## Future Improvements
 Aside from general cleanup of code, adding comments, and refactoring; I'd like to factor in rounding when accounting for amounts. Currently it just accepts any float.
 
-Adding timestamps for when transactions took place would also be absolutely essential and would be impelemented in a future release.
+Adding timestamps for when transactions took place would also be absolutely essential and would be implemented in a future release.
 
 Currently the payment total throws an ArithmeticError if a string is passed as the payment value, ie. "10". This will need to be properly handled.
 
