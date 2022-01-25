@@ -6,6 +6,8 @@ This purpose of this pull request is to handle basic API functionality. However,
 
 The program makes the assumption that the intent of a request has already been parsed and we know the intent. From there were are able to fork into the functions below.
 
+Currently data persists in the `paypi.db` file used by SQLite.
+
 ## Functions
 There are five main functions in PayPI:
 - Create Order
