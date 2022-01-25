@@ -1,5 +1,5 @@
 # PayPI
-PayPI (pronounce pay-pea-eye - I like puns) is a prototype system for handling API calls.
+PayPI (pronounced _pay-pea-eye_ - I like puns) is a prototype system for handling API calls.
 
 ## Purpose
 This purpose of this pull request is to handle basic API functionality. However, it should be noted that this is a work in progress and is meant to generate interest in creating comprehensive APIs.
