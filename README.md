@@ -15,9 +15,10 @@ There are five main functions in PayPI:
 - Create a New Order and Apply Payment
 
 ## Features
-There are two critical features built into PayPI:
+There are three critical features built into PayPI:
 - Idempotency is included through the use of a payment key to prevent the same payment from submitting multiple times.
 - When creating a new order and applying payment, should there be any server errors between the creation of the order and the creation of the payment, the order will be deleted so it will not persist in memory. The payment will not be registered. 
+- The payload returned by each function call attempts to be as helpful as possible by returning a status of either `:success` or `:error` along with a reason that explains what went wrong in the case of a failure. User-friendliness is absolutely critical in software design - people like to use friendly things.
 
 Lesser features include:
 - Conversion of strings to numbers when applicable. For instance, if customer_id is submitted as a string, PayPI will work to convert it to an integer. The same goes for payment and order values, except to floats instead of integers.
