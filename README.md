@@ -88,7 +88,7 @@ Things I feel like I need to improve:
 - using function return values appropriately
 - writing more concise and maintainable code, and I know that comes with practice
 - much of the code could stand to be refactored and improved. Granted, this is only a rough prototype.
-- I know for a fact I need to add test cases; given the time restraints though I had to settle for basic functional testing (albeit without the black-box). Being able to write effective tests is definitely a goal.
+- I know for a fact I need to add test cases; given the time restraints though I had to settle for basic functional testing (albeit without the black-box). Being able to write effective tests is definitely a priority.
 - Documenting the code is a necessity. That would absolutely be the next step in order to facilitate its use.
 
 ## Final Notes
