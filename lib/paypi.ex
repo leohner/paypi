@@ -1,71 +1,86 @@
 defmodule Paypi do
+  @moduledoc """
+  Documentation for `Paypi` (pronounced Pay-Pea-Eye).
+
+  The Paypi module acts as an entry point into the PayPI API application.
+  It has one function that accepts a variety of parameters.
+  See README for more information.
+  """
+
   alias Paypi.Create
-  alias Paypi.Data
   alias Paypi.Get
   alias Paypi.Pay
   alias Paypi.Store
-  @moduledoc """
-  Documentation for `Paypi` (pronounced Pay-Pea-Eye).
-  """
 
+
+  @doc """
+  Runs the application based on provided parameters.
+  Accepts the following:
+  - {:create_order, customer_id, order_amount}
+  - {:get_order, order_id}
+  - {:get_orders, email}
+  - {:pay, order_id, payment_amount, payment_key}
+  - {:create_pay, customer_id, order_amount, payment_amount, payment_key}
+
+  All other requests will be routed as invalid.
+  """
   def run({:create_order, customer_id, order_amount}) do
+    # Store provided params in Agent
     params = %{action: :create_order, customer_id: customer_id, order_amount: order_amount}
     Store.start_link(params)
 
+    # Attempt to create order with provided customer id and order amount
     Create.create_order(customer_id, order_amount)
 
-    generate_payload(:create)
-    inspect_results()
+    # Create payload based on information from Create.create_order()
+    payload = generate_payload(:create_order)
+
+    # Print payload to console for ease of viewing data and return payload
+    IO.inspect payload
+    payload
   end
 
   def run({:get_order, order_id}) do
     params = %{action: :get_order, order_id: order_id}
     Store.start_link(params)
 
-    Data.get_email_by_order_id(order_id)
     Get.get_order(order_id)
 
-    generate_payload(:get)
-    inspect_results()
+    payload = generate_payload(:get_order)
+
+    # Print payload to console for ease of viewing data and return payload
+    IO.inspect payload
+    payload
   end
 
-  def run({:get_orders, email}) when is_binary(email) do
-    params = %{action: :get_order, email: email}
+  def run({:get_orders, email}) do
+    params = %{action: :get_orders, email: email}
     Store.start_link(params)
 
     Get.get_orders(email)
 
-    generate_payload(:get)
-    inspect_results()
-  end
+    payload = generate_payload(:get_orders)
 
-  def run({:get_orders, bad_email}) do
-    %{
-      action: :get_order,
-      email: bad_email,
-      email_valid: :false,
-      result_status: :error,
-      result_message: "Email must be a string"
-    }
-      |> Store.start_link()
-
-    generate_payload(:get)
-    inspect_results()
+    # Print payload to console for ease of viewing data and return payload
+    IO.inspect payload
+    payload
   end
 
   # in practice, the payment_key (used for idempotency) would be passed by the client to the API
   # for this demo, the payment key will be generated inside the run function to simulate the behavior
   # leaving the parameter in the function so that it can be tested when necessary
-  # hard code
-  def run({:pay, order_id, amount, payment_key}) do
+  def run({:pay, order_id, payment_amount, payment_key}) do
     payment_key = generate_payment_key(payment_key)
-    params = %{action: :pay, order_id: order_id, payment_amount: amount, payment_key: payment_key, payment_key_valid: :true}
+    params = %{action: :pay, order_id: order_id, payment_amount: payment_amount, payment_key: payment_key, payment_key_valid: :true}
     Store.start_link(params)
 
-    Pay.pay(order_id, amount, payment_key)
+    Pay.pay(order_id, payment_amount, payment_key)
 
-    generate_payload(:pay)
-    inspect_results()
+    payload = generate_payload(:pay)
+
+    # Print payload to console for ease of viewing data and return payload
+    IO.inspect payload
+    payload
   end
 
   def run({:create_pay, customer_id, order_amount, payment_amount, payment_key}) do
@@ -73,18 +88,24 @@ defmodule Paypi do
     params = %{action: :create_pay, customer_id: customer_id, order_amount: order_amount, payment_amount: payment_amount, payment_key: payment_key, payment_key_valid: :true}
     Store.start_link(params)
 
-    Pay.order_and_pay(customer_id, order_amount, payment_amount, payment_key)
+    Pay.order_and_pay(customer_id, order_amount, payment_amount)
 
-    generate_payload(:pay)
-    inspect_results()
+    payload = generate_payload(:create_pay)
+
+    # Print payload to console for ease of viewing data and return payload
+    IO.inspect payload
+    payload
   end
 
   def run(_) do
     params = %{action: :invalid}
     Store.start_link(params)
 
-    generate_payload(:invalid)
-    inspect_results()
+    payload = generate_payload(:invalid)
+
+    # Print payload to console for ease of viewing data and return payload
+    IO.inspect payload
+    payload
   end
 
 
@@ -93,18 +114,18 @@ defmodule Paypi do
   ## Private Functions
   ## ***
 
+  # Normally, a payment key would provided from the client, but this will work for demo purposes
+  # Generate a UUID with Ecto if the provided key is nil or is not a string
   defp generate_payment_key(key) when key == :nil or not is_binary(key) do
     Ecto.UUID.generate()
   end
 
+  # When a payment is falls through and is a string, use it
   defp generate_payment_key(key) when is_binary(key) do
     key
   end
 
-  defp inspect_results() do
-    Store.print_everything()
-  end
-
+  # Createas a payload of information to return to the user
   defp generate_payload(action) do
     Store.generate_payload(action)
   end

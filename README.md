@@ -1,5 +1,5 @@
 # PayPI
-PayPI (pronounce pay-pea-eye) is a prototype system for handling API calls.
+PayPI (pronounce pay-pea-eye - I like puns) is a prototype system for handling API calls.
 
 ## Purpose
 This purpose of this pull request is to handle basic API functionality. However, it should be noted that this is a work in progress and is meant to generate interest in creating comprehensive APIs.
@@ -39,7 +39,7 @@ The application is used by running the `Paypi.run` function with values specifie
 - `order_id` is the order id for which we're getting details.
 
 ### Get Orders
-`mix run -e "Paypi.run({:get_orders, \"email\"})"`
+`mix run -e "Paypi.run({:get_orders, \"email@address.com\"})"`
 
 - `:get_orders` is the action parsed from the request.
 - `email` is the email for which we're getting orders. Note that it the quotes around it are escaped. This is necessary.
@@ -53,7 +53,7 @@ The application is used by running the `Paypi.run` function with values specifie
 - `payment_key` is a unique identifier used for idempotency.
 
 ### Create and Pay
-`mix run -e "Paypi.run({:create_pay, customer_id, order_amount, payment_amount, payment)key})"`
+`mix run -e "Paypi.run({:create_pay, customer_id, order_amount, payment_amount, payment_key})"`
 
 - `:create_pay` is the action parsed from the request.
 - `customer_id` is the id of the customer for which we're creating an order.
@@ -65,6 +65,11 @@ The application is used by running the `Paypi.run` function with values specifie
 ## Future Improvements
 Aside from general cleanup of code, adding comments, and refactoring; I'd like to factor in rounding when accounting for amounts. Currently it just accepts any float.
 
+Adding timestamps for when transactions took place would also be absolutely essential and would be impelemented in a future release.
+
+Currently the payment total throws an ArithmeticError if a string is passed as the payment value, ie. "10". This will need to be properly handled.
+
+You can also currently submit negative values as a payment amount and the application will accept it. This is a known issue and will be fixed in a future release.
 
 ## Additional Notes
 I would like to note that this only the second application I have built in Elixir, the first being a console-based todo app, which can be seen on my github as well. And that one I only put together on the 17th of January, 2022. 
@@ -81,7 +86,9 @@ Things I've learned through this include:
 Things I feel like I need to improve:
 - using function return values appropriately
 - writing more concise and maintainable code, and I know that comes with practice
-- much of the code could stand to be refactored. The Get module was used early on in the development of this feature, but it was made redundant by the Data module
+- much of the code could stand to be refactored and improved. Granted, this is only a rough prototype.
 - I know for a fact I need to add test cases; given the time restraints though I had to settle for basic functional testing (albeit without the black-box). Being able to write effective tests is definitely a goal.
 - Documenting the code is a necessity. That would absolutely be the next step in order to facilitate its use.
 
+## Final Notes
+One of the best adventures of my life happened because of Peek: snorkeling in the reefs off of Key Largo, Florida, because John Pennekamp State Park uses Peek products. This was back in October before Peek was on my radar. I would love to learn more, improve my code, and be part of a organization that helps business offer their services and allows people to take adventures they otherwise would not have.
